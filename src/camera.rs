@@ -104,7 +104,7 @@ impl Camera {
         if world.hit(r, Interval::new(0.001, INFINITY), &mut rec) {
             // let direction = Vec3::random_on_hemisphere(rec.normal);
             let direction = rec.normal + Vec3::random_unit_vector();
-            return (self.ray_color(Ray::ray(rec.p, direction), depth-1, world))*0.3;
+            return (self.ray_color(Ray::ray(rec.p, direction), depth-1, world))*0.5;
             // return (Color::new(1., 1., 1.) + rec.normal)*0.5;
         }
 
@@ -118,4 +118,5 @@ impl Camera {
         // Werte nehmen gleichmäßig ab und zu, dadurch Farbzahlen nie größer als 1
         Color::new(1.0, 1.0, 1.0)*(1.0-a) + Color::new(0.5, 0.7, 1.0)*a
     }
+
 }
