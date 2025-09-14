@@ -1,0 +1,7 @@
+target/*
+target/debug/*
+target/release/*
+!target/debug
+!target/release
+!target/debug/raytracer.exe
+!target/release/raytracer.exe
