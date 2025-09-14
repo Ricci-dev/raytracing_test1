@@ -17,8 +17,16 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(aspect_ratio: f64, image_width: i32, samples_per_pixel: i32, max_depth: i32) -> Camera {
-        let origin = Point3::new(0., 0., 0.);
-        Camera { aspect_ratio, image_width, samples_per_pixel, max_depth, image_height: 0, pixel_samples_scale: 0., center: origin.clone(), pixel00_loc: origin.clone(), pixel_delta_u:origin.vec3(), pixel_delta_v: origin.vec3() }
+        let origin = Point3::origin();
+        Camera {
+            aspect_ratio, image_width, samples_per_pixel, max_depth,
+            image_height: 0,
+            pixel_samples_scale: 0.,
+            center: origin.clone(),
+            pixel00_loc: origin.clone(),
+            pixel_delta_u:origin.vec3(),
+            pixel_delta_v: origin.vec3()
+        }
     }
 
     pub fn render<T: Hittable>(&mut self, world: &HittableList<T>) {
@@ -64,20 +72,22 @@ impl Camera {
         self.pixel_samples_scale = 1. / self.samples_per_pixel as f64;
 
         // Distance viewport <=> camera center
-        let focal_length = 1.0;
-        let viewport_height = 2.0;
+        let focal_length = 1.;
+        let viewport_height = 2.;
         // calc actual ratio: i_width / i_height
         // calc viewport_wdith: v_width / v_height = a_ratio => a_ratio * v_height = v_width
         let viewport_width = viewport_height * ((self.image_width as f64)/(self.image_height) as f64);
-        self.center = Point3::new(0.0, 0.0, 0.0);
+        
+        // Camera center is set in construcor - Duplicate?
+        //self.center = Point3::new(0., 0., 0.);
 
-        let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
-        let viewport_v = Vec3::new(0.0, -viewport_height, 0.0);
+        let viewport_u = Vec3::new(viewport_width, 0., 0.);
+        let viewport_v = Vec3::new(0., -viewport_height, 0.);
 
         self.pixel_delta_u = viewport_u / (self.image_width as f64);
         self.pixel_delta_v = viewport_v / (self.image_height as f64);
 
-        let viewport_upper_left = self.center - Vec3::new(0.0, 0.0, focal_length) - (viewport_u/2) - (viewport_v/2);
+        let viewport_upper_left = self.center - Vec3::new(0., 0., focal_length) - (viewport_u/2) - (viewport_v/2);
         self.pixel00_loc = viewport_upper_left + ((self.pixel_delta_u + self.pixel_delta_v)*0.5);
         eprintln!("Image, width: {}, height; {}", self.image_width, self.image_height);
         eprintln!("Viewport, width: {}, height; {}", viewport_width, viewport_height);

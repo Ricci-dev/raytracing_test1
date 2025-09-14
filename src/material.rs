@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{colour::Color, hittable::HitRecord, ray::Ray, vec3::{Vec3, Vec3Trait}};
 
 pub trait Material {
@@ -12,10 +14,10 @@ pub struct Lambertian {
 }
 
 impl Lambertian {
-    pub fn new(albedo: Color) -> Self {
-        Self {
+    pub fn new(albedo: Color) -> Rc<Self> {
+        Rc::new(Self {
             albedo
-        }
+        })
     }
 }
 
@@ -35,11 +37,11 @@ pub struct Metal {
 }
 
 impl Metal {
-    pub fn new(albedo: Color, fuzz: f64) -> Self {
-        Self {
+    pub fn new(albedo: Color, fuzz: f64) -> Rc<Self> {
+        Rc::new(Self {
             albedo,
             fuzz: if fuzz < 1. {fuzz} else {1.},
-        }
+        })
     }
 }
 
@@ -58,5 +60,25 @@ impl Material for Metal {
         reflected = reflected.unit_vector() + (Vec3::random_unit_vector() * self.fuzz);
         let scattered = Ray::ray(rec.p, reflected);
         (scattered.direction().dot(rec.normal) > 0., self.albedo, scattered)
+    }
+}
+
+pub struct Dielectric {
+    refraction_index: f64,
+}
+
+impl Dielectric {
+    pub fn new(refraction_index: f64) -> Rc<Self> {
+        Rc::new(Self { refraction_index })
+    }
+}
+
+impl Material for Dielectric {
+    fn scatter(&self, r_in: Ray, rec: &HitRecord) -> (bool, Color, Ray) {
+        let ri = if rec.front_face {1. / self.refraction_index} else {self.refraction_index};
+
+        let unit_direction = r_in.direction().unit_vector();
+        let refracted = Vec3::refract(unit_direction, rec.normal, ri);
+        (true, Color::white(), Ray::ray(rec.p, refracted))
     }
 }
