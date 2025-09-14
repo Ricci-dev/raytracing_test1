@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use raytracer::colour::Color;
 use raytracer::material::{Dielectric, Lambertian, Metal};
 use raytracer::sphere::Sphere;
