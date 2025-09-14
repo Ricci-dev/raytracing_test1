@@ -16,6 +16,10 @@ impl Point3 {
         Point3(x, y, z)
     }
 
+    pub fn origin() -> Point3 {
+        Point3(0., 0., 0.)
+    }
+
     pub fn point3(self) -> Point3 {
         self
     }

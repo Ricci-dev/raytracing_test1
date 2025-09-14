@@ -32,6 +32,13 @@ impl Color {
         Color(r, g, b)
     }
 
+    pub fn black() -> Color {
+        Color(0., 0., 0.)
+    }
+
+    pub fn white() -> Color {
+        Color(1., 1., 1.)
+    }
 
     pub fn r(&self) -> f64 {
         self.0
@@ -115,6 +122,18 @@ impl Mul<f64> for Color {
             self.0 * other,
             self.1 * other,
             self.2 * other,
+        )
+    }
+}
+
+impl Mul<Color> for Color {
+    type Output = Color;
+
+    fn mul(self, other: Color) -> Color {
+        Self(
+            self.0 * other.r(),
+            self.1 * other.g(),
+            self.2 * other.b(),
         )
     }
 }

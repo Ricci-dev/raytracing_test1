@@ -14,6 +14,13 @@ impl Ray {
         }
     }
 
+    pub fn placeholder() -> Ray {
+        Ray {
+            origin: Point3::origin(),
+            direction: Vec3::nowhere(),
+        }
+    }
+
     pub fn at(&self, t: f64) -> Point3 {
         return self.origin + self.direction*t;
     }

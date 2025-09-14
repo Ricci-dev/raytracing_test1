@@ -49,6 +49,10 @@ impl Vec3 {
         Self(x, y, z)
     }
 
+    pub fn nowhere() -> Self {
+        Self(0., 0., 0.)
+    }
+
     pub fn cross(&self, other: impl Vec3Trait) -> Self {
         Self(
             self.y()*other.z() - self.z()*other.y(),
@@ -72,6 +76,15 @@ impl Vec3 {
     pub fn random_on_hemisphere(normal: Vec3) -> Vec3 {
         let on_unit_sphere = Vec3::random_unit_vector();
         if on_unit_sphere.dot(normal) > 0. {on_unit_sphere} else {on_unit_sphere*(-1.)}
+    }
+
+    pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
+        v - n*v.dot(n)*2.
+    }
+
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        self.x().abs() < s && self.y().abs() < s && self.z().abs() < s
     }
 
     pub fn vec3(self) -> Self {

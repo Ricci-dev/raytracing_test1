@@ -1,8 +1,11 @@
 [package]
 name = "raytracer"
-version = "0.0.4"
+version = "0.0.7"
 edition = "2024"
 
 [dependencies]
 getrandom = "0.3"
 rand = "0.8.5"
+
+[profile.dev]
+opt-level = 3

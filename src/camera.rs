@@ -102,10 +102,11 @@ impl Camera {
 
         let mut rec = HitRecord::placeholder();
         if world.hit(r, Interval::new(0.001, INFINITY), &mut rec) {
-            // let direction = Vec3::random_on_hemisphere(rec.normal);
-            let direction = rec.normal + Vec3::random_unit_vector();
-            return (self.ray_color(Ray::ray(rec.p, direction), depth-1, world))*0.5;
-            // return (Color::new(1., 1., 1.) + rec.normal)*0.5;
+            let (scatter_res, attenuation, scattered) = rec.mat.scatter(r, &rec);
+            if scatter_res {
+                return self.ray_color(scattered, depth-1, world) * attenuation;
+            }
+            return Color::black();
         }
 
         // y ist kleiner, gleich 1; größtmöglicher Wert: 1, damit unit_vector Länge = 1 ist
