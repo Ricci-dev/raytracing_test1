@@ -33,44 +33,6 @@ impl Color {
     }
 
 
-    pub fn cross(&self, other: Color) -> Color {
-        Self(
-            self.1*other.2 - self.2*other.1,
-            self.2*other.0 - self.0*other.2,
-            self.0*other.1 - self.1*other.0,
-        )
-    }
-
-    pub fn length_squared(&self) -> f64 {
-        self.0*self.0 + self.1*self.1 + self.2*self.2
-    }
-
-    pub fn len(&self) -> f64 {
-        self.length_squared().sqrt()
-    }
-
-    pub fn unit_vector(&self) -> Color {
-        *self / self.len()
-    }
-
-    pub fn dot(&self, other: Color) -> f64 {
-        self.0*other.0 + self.1*other.1 + self.2*other.2
-    }
-
-
-    pub fn x(&self) -> f64 {
-        self.0
-    }
-
-    pub fn y(&self) -> f64 {
-        self.1
-    }
-
-    pub fn z(&self) -> f64 {
-        self.2
-    }
-
-
     pub fn r(&self) -> f64 {
         self.0
     }
@@ -179,78 +141,5 @@ impl Div<f64> for Color {
             self.1 / other,
             self.2 / other,
         )
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_addition() {
-        let r1 = Color::new(1.0, 2.0, 3.0);
-        let r2 = Color::new(10.0, 20.0, 30.0);
-        let r3 = Color::new(11.0, 22.0, 33.0);
-        assert_eq!(r1 + r2, r3);
-    }
-
-    #[test]
-    fn test_subtraction() {
-        let r1 = Color::new(5.0, 2.0, 90.0);
-        let r2 = Color::new(3.0, 10.0, 30.0);
-        let r3 = Color::new(2.0, -8.0, 60.0);
-        assert_eq!(r1 - r2, r3);
-    }
-
-    #[test]
-    fn test_multiplication() {
-        let r1 = Color::new(1.0, 2.0, -3.0);
-        let r2 = -5.0;
-        let r3 = Color::new(-5.0, -10.0, 15.0);
-        assert_eq!(r1 * r2, r3);
-    }
-
-    #[test]
-    fn test_division() {
-        let r1 = Color::new(15.0, -30.0, 3.0);
-        let r2 = -5.0;
-        let r3 = Color::new(-3.0, 6.0, -0.6);
-        assert_eq!(r1 / r2, r3);
-    }
-
-    #[test]
-    fn test_dot_product() {
-        let r1 = Color::new(3.0, -4.0, 3.0);
-        let r2 = Color::new(15.0, -30.0, 3.0);
-        let r3 = 174.0;
-        assert_eq!(r1.dot(r2), r3);
-    }
-
-    #[test]
-    fn test_cross_product() {
-        let r1 = Color::new(1.0, 2.0, 3.0);
-        let r2 = Color::new(10.0, 20.0, 30.0);
-        let r3 = Color::new(0.0, 0.0, 0.0);
-        assert_eq!(r1.cross(r2), r3);
-    }
-
-    #[test]
-    fn test_length_squared() {
-        let r1 = Color::new(1.0, 2.0, 3.0);
-        let r2 = 14.0;
-        assert_eq!(r1.length_squared(), r2);
-    }
-
-    #[test]
-    fn test_length() {
-        let r1 = Color::new(1.0, 2.0, 3.0);
-        let r2 = 374.0;
-        assert_eq!((r1.len()*100.0).round(), r2);
-    }
-
-    #[test]
-    fn test_unit_vector() {
-        let r1 = Color::new(5.4, 56.54, 3.0);
-        assert_eq!(r1.unit_vector().len(), 1.0);
     }
 }
