@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::{colour::Color, hittable::HitRecord, ray::Ray, vec3::{Vec3, Vec3Trait}};
+use crate::{colour::Color, hittable::HitRecord, ray::Ray, rtweekend::get_random_f64, vec3::{Vec3, Vec3Trait}};
 
 pub trait Material {
     fn scatter(&self, r_in: Ray, rec: &HitRecord) -> (bool, Color, Ray);
@@ -71,6 +71,12 @@ impl Dielectric {
     pub fn new(refraction_index: f64) -> Rc<Self> {
         Rc::new(Self { refraction_index })
     }
+
+    pub fn reflectance(&self, cosine: f64, refraction_index: f64) -> f64 {
+        let mut r0 = (1. - refraction_index) / (1. + refraction_index);
+        r0 = r0*r0;
+        r0 + (1.-r0)*f64::powi(1. - cosine, 5)
+    }
 }
 
 impl Material for Dielectric {
@@ -78,7 +84,13 @@ impl Material for Dielectric {
         let ri = if rec.front_face {1. / self.refraction_index} else {self.refraction_index};
 
         let unit_direction = r_in.direction().unit_vector();
-        let refracted = Vec3::refract(unit_direction, rec.normal, ri);
-        (true, Color::white(), Ray::ray(rec.p, refracted))
+        let cos_theta = (unit_direction*(-1.)).dot(rec.normal).min(1.);
+        let sin_theta = (cos_theta*cos_theta*(-1.) + 1.).sqrt();
+
+        let cannot_refract = ri*sin_theta > 1.;
+        let direction = if cannot_refract || self.reflectance(cos_theta, ri) > get_random_f64() {Vec3::reflect(unit_direction, rec.normal)}
+                                else {Vec3::refract(unit_direction, rec.normal, ri)};
+
+        (true, Color::white(), Ray::ray(rec.p, direction))
     }
 }
