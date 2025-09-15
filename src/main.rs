@@ -22,7 +22,7 @@ fn main() {
 
     let mut cam = Camera::new(
         16./9.,
-        3840,
+        400,
         100,
         50
     );
