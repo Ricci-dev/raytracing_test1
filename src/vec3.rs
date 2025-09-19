@@ -75,6 +75,7 @@ impl Vec3 {
 
     pub fn random_on_hemisphere(normal: Vec3) -> Vec3 {
         let on_unit_sphere = Vec3::random_unit_vector();
+        // Resultierenden Vektor begrenzen, damit winkel zur normale nicht größer als 90° in beide Richtungen ist
         if on_unit_sphere.dot(normal) > 0. {on_unit_sphere} else {on_unit_sphere*(-1.)}
     }
 

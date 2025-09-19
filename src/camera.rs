@@ -1,6 +1,6 @@
 use std::io::{stderr, Write};
 
-use crate::{colour::{write_color, Color}, hittable::{HitRecord, Hittable}, hittable_list::HittableList, interval::Interval, point3::Point3, ray::Ray, rtweekend::{get_random_f64, INFINITY}, vec3::{Vec3, Vec3Trait}};
+use crate::{colour::{write_color, Color}, hittable::{HitRecord}, hittable_list::HittableList, interval::Interval, point3::Point3, ray::Ray, rtweekend::{get_random_f64, INFINITY}, vec3::{Vec3, Vec3Trait}};
 
 pub struct Camera {
     aspect_ratio: f64,
@@ -116,13 +116,13 @@ impl Camera {
     }
 
     fn ray_color(&self, r: Ray, depth: i32, world: &HittableList) -> Color {
-        // Stop recursion after max `depth` recusions
+        // Stop recursion after max `depth` recusions (max ray bounces)
         if depth <= 0 {return Color::new(0., 0., 0.)}
 
         // The `HitRecord` contains the Point that got hit and its Material
         // `rec.t` is used to determin the distance from the camera to the Point that got hit
         // The surface normal `rec.normal` is a unit vector, perpendicular to the surface at the Point that got hit
-        // Surface normal purpose?
+        // The surface normal is used for comparison, to check if vectors starting at the hitpoint, point into the object or outwards (?)
         let mut rec = HitRecord::placeholder();
         if world.hit(r, Interval::new(0.001, INFINITY), &mut rec) {
             let (scatter_res, attenuation, scattered) = rec.mat.scatter(r, &rec);

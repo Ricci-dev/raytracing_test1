@@ -48,12 +48,13 @@ impl Metal {
 impl Material for Metal {
     /// Returns (bool, attenuation, scattered)
     /// 
+    ///  * `reflect` - If the light should be reflected (true) or absorbed (false)
     ///  * `attenuation` - ?
     ///  * `scattered` - ?
     /// ```
     /// use raytracer::{material::{NoMat, Material}, ray::Ray, hittable::HitRecord};
     /// let mat = NoMat{};
-    /// let (idk, attenuation, scattered) = mat.scatter(Ray::placeholder(), &HitRecord::placeholder());
+    /// let (reflect, attenuation, scattered) = mat.scatter(Ray::placeholder(), &HitRecord::placeholder());
     /// ```
     fn scatter(&self, r_in: Ray, rec: &HitRecord) -> (bool, Color, Ray) {
         let mut reflected = Vec3::reflect(r_in.direction(), rec.normal);
