@@ -29,7 +29,7 @@ impl Camera {
         }
     }
 
-    pub fn render<T: Hittable>(&mut self, world: &HittableList<T>) {
+    pub fn render(&mut self, world: &HittableList) {
         self.initialize();
 
         println!("P3\n{} {}\n255", self.image_width, self.image_height);
@@ -115,7 +115,7 @@ impl Camera {
         Vec3::new(get_random_f64() - 0.5, get_random_f64() - 0.5, 0.)
     }
 
-    fn ray_color<T: Hittable>(&self, r: Ray, depth: i32, world: &HittableList<T>) -> Color {
+    fn ray_color(&self, r: Ray, depth: i32, world: &HittableList) -> Color {
         // Stop recursion after max `depth` recusions
         if depth <= 0 {return Color::new(0., 0., 0.)}
 

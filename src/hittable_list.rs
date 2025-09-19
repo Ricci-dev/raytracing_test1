@@ -1,15 +1,16 @@
 use crate::{hittable::{HitRecord, Hittable}, interval::Interval, ray::Ray};
 
-pub struct HittableList<T: Hittable> {
-    objects: Vec<Box<T>>,
+pub struct HittableList {
+    objects: Vec<Box<dyn Hittable>>,
 }
 
-impl<T> HittableList<T> where T: Hittable {
-    pub fn new() -> HittableList<T> {
+impl HittableList {
+    pub fn new() -> HittableList {
         HittableList { objects: vec![] }
     }
 
-    pub fn add(&mut self, object: T) {
+    // Static bad? - RAM filling when creating and removing objects?
+    pub fn add(&mut self, object: impl Hittable + 'static) {
         self.objects.push(Box::new(object));
     }
 
