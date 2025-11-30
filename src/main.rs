@@ -4,6 +4,7 @@ use raytracer::sphere::Sphere;
 use raytracer::point3::{Point3};
 use raytracer::hittable_list::HittableList;
 use raytracer::camera::Camera;
+use raytracer::vec3::Vec3;
 
 fn main() {
     let mut world = HittableList::new();
@@ -26,6 +27,9 @@ fn main() {
         100,
         50,
         90.,
+        Point3::new(-2., 2., 1.),
+        Point3::new(0., 0., -1.),
+        Vec3::new(0., 1., 0.),
     );
     cam.render(&world);
 }

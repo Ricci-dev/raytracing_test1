@@ -3,30 +3,42 @@ use std::io::{stderr, Write};
 use crate::{colour::{Color, write_color}, hittable::HitRecord, hittable_list::HittableList, interval::Interval, point3::Point3, ray::Ray, rtweekend::{INFINITY, degrees_to_radians, get_random_f64}, vec3::{Vec3, Vec3Trait}};
 
 pub struct Camera {
-    aspect_ratio: f64,
-    image_width: i32,
-    samples_per_pixel: i32,
-    max_depth: i32,
+    pub aspect_ratio: f64,
+    pub image_width: i32,
+    pub samples_per_pixel: i32,
+    pub max_depth: i32,
+
+    pub vfov: f64, // vertical view angle
+    pub lookfrom: Point3, // Pos where cam is looking from
+    pub lookat: Point3, // Pos where cam is looking at
+    pub vup: Vec3, // Camera-relative up direction
+
     image_height: i32,
     pixel_samples_scale: f64,
     center: Point3,
     pixel00_loc: Point3,
     pixel_delta_u: Vec3,
     pixel_delta_v: Vec3,
-    vfov: f64,
+    // Camera frame basis vectors
+    v: Vec3,
+    u: Vec3,
+    w: Vec3,
 }
 
 impl Camera {
-    pub fn new(aspect_ratio: f64, image_width: i32, samples_per_pixel: i32, max_depth: i32, vfov: f64) -> Camera {
+    pub fn new(aspect_ratio: f64, image_width: i32, samples_per_pixel: i32, max_depth: i32, vfov: f64, lookfrom: Point3, lookat: Point3, vup: Vec3) -> Camera {
         Camera {
-            aspect_ratio, image_width, samples_per_pixel, max_depth, vfov,
+            aspect_ratio, image_width, samples_per_pixel, max_depth, vfov, lookfrom, lookat, vup,
             // everything zero, values are set later in init
             image_height: 0,
             pixel_samples_scale: 0.,
-            center: Point3::origin(),
+            center: lookfrom,
             pixel00_loc: Point3::origin(),
             pixel_delta_u: Vec3::nowhere(),
             pixel_delta_v: Vec3::nowhere(),
+            v: Vec3::nowhere(),
+            u: Vec3::nowhere(),
+            w: Vec3::nowhere(),
         }
     }
 
@@ -73,7 +85,7 @@ impl Camera {
         self.pixel_samples_scale = 1. / self.samples_per_pixel as f64;
 
         // Distance viewport <=> camera center
-        let focal_length = 1.;
+        let focal_length = (self.lookfrom - self.lookat).len();
         let theta = degrees_to_radians(self.vfov);
         let h = f64::tan(theta/2.);
         // viewport is a virtual rectanglein R3, with the area, we are currently watching (?)
@@ -83,14 +95,19 @@ impl Camera {
         // calc actual ratio, to be more accurate (there are no 0.5 or 0.3532 pixel, that's why set ratio could be inacurate): i_width / i_height
         // calc viewport_wdith: v_width / v_height = a_ratio => a_ratio * v_height = v_width
         let viewport_width = viewport_height * ((self.image_width as f64)/(self.image_height) as f64);
+
+        // Calculate the u, v, w unit basis vectors for the camera coordinate frame
+        self.w = (self.lookfrom - self.lookat).unit_vector();
+        self.u = self.vup.cross(self.w).unit_vector();
+        self.v = self.w.cross(self.u);
         
         // Camera center is set in construcor - Duplicate?
         //self.center = Point3::new(0., 0., 0.);
 
         // Vector from left side of viewport to right side
-        let viewport_u = Vec3::new(viewport_width, 0., 0.);
+        let viewport_u = viewport_width * self.u;
         // Vector from top of viewport to bottom
-        let viewport_v = Vec3::new(0., -viewport_height, 0.);
+        let viewport_v = viewport_height * -1. * self.v;
 
         // distance between pixels in viewport side
         self.pixel_delta_u = viewport_u / (self.image_width as f64);
@@ -99,7 +116,8 @@ impl Camera {
 
         // position of the upper left corner of the viewport (also determines general position of the viewport)
         // TODO: describe effect of focal len better
-        let viewport_upper_left = self.center - Vec3::new(0., 0., focal_length) - (viewport_u/2) - (viewport_v/2);
+        // let viewport_upper_left = self.center - Vec3::new(0., 0., focal_length) - (viewport_u/2) - (viewport_v/2);
+        let viewport_upper_left = self.center - focal_length*self.w - (viewport_u/2) - (viewport_v/2);
         // position of the pixel in the upper left corner of the viewport
         self.pixel00_loc = viewport_upper_left + ((self.pixel_delta_u + self.pixel_delta_v)*0.5);
         eprintln!("Image, width: {}, height; {}", self.image_width, self.image_height);
