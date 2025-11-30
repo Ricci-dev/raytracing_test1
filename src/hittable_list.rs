@@ -10,6 +10,7 @@ impl HittableList {
     }
 
     // Static bad? - RAM filling when creating and removing objects?
+    // Answer?: Fat pointer, static != static, static = ?, so its fine
     pub fn add(&mut self, object: impl Hittable + 'static) {
         self.objects.push(Box::new(object));
     }
@@ -19,6 +20,7 @@ impl HittableList {
     }
 
     pub fn hit(&self, r: Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
+        // TODO: calc only hitrecord of closest, w `get_hit_record` method?
         let mut hit_anything = false;
         let mut closest_so_far = ray_t.max();
 

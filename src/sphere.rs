@@ -16,6 +16,7 @@ impl Sphere {
 
 impl Hittable for Sphere {
     fn hit(&self, r: Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
+        // calculate for what t does the ray hit the sphere
         let oc = self.center - r.origin();
         let a = r.direction().length_squared();
         let h = r.direction().dot(oc);
@@ -28,6 +29,8 @@ impl Hittable for Sphere {
 
         let sqrtd = discriminant.sqrt();
 
+        // minus will produce smaller value than plus
+        // => nearer hit point is checked first
         let mut root = (h - sqrtd) / a;
         if !ray_t.surrounds(root) {
             root = (h + sqrtd) / a;
@@ -36,9 +39,14 @@ impl Hittable for Sphere {
             }
         }
 
+        // outsource to a `get_hit_rec` func?
         rec.t = root;
+        // ray intersection point
         rec.p = r.at(rec.t);
+        // this is a surface normal (perpendicular to the surface at the intersection point)
+        // this vector is also a unit vector (len: 1)
         let outward_normal = (rec.p - self.center) / self.radius;
+        // make sure surface normal points outwards of object
         rec.set_face_normal(r, outward_normal);
         rec.mat = self.mat.clone();
 

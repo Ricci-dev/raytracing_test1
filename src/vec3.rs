@@ -156,6 +156,19 @@ impl Sub for Vec3 {
     }
 }
 
+impl Mul<Vec3> for i32 {
+    type Output = Vec3;
+
+    fn mul(self, other: Vec3) -> Vec3 {
+        let self_f = self as f64;
+        Vec3(
+            other.0 * self_f,
+            other.1 * self_f,
+            other.2 * self_f,
+        )
+    }
+}
+
 impl Mul<i32> for Vec3 {
     type Output = Vec3;
 
@@ -165,6 +178,18 @@ impl Mul<i32> for Vec3 {
             self.0 * other,
             self.1 * other,
             self.2 * other,
+        )
+    }
+}
+
+impl Mul<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn mul(self, other: Vec3) -> Vec3 {
+        Vec3(
+            other.0 * self,
+            other.1 * self,
+            other.2 * self,
         )
     }
 }

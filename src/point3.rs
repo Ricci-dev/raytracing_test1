@@ -73,6 +73,19 @@ impl Sub for Point3 {
     }
 }
 
+impl Mul<Point3> for i32 {
+    type Output = Point3;
+
+    fn mul(self, other: Point3) -> Point3 {
+        let self_f = self as f64;
+        Point3(
+            other.0 * self_f,
+            other.1 * self_f,
+            other.2 * self_f,
+        )
+    }
+}
+
 impl Mul<i32> for Point3 {
     type Output = Point3;
 
@@ -82,6 +95,18 @@ impl Mul<i32> for Point3 {
             self.0 * other,
             self.1 * other,
             self.2 * other,
+        )
+    }
+}
+
+impl Mul<Point3> for f64 {
+    type Output = Point3;
+
+    fn mul(self, other: Point3) -> Point3 {
+        Point3(
+            other.0 * self,
+            other.1 * self,
+            other.2 * self,
         )
     }
 }

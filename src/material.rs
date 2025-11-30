@@ -27,6 +27,7 @@ impl Material for Lambertian {
 
         if scatter_direction.near_zero() {scatter_direction = rec.normal}
 
+        // scatter, attenuation, scatter_direction
         (true, self.albedo, Ray::ray(rec.p, scatter_direction))
     }
 }
@@ -50,7 +51,7 @@ impl Material for Metal {
     /// 
     ///  * `reflect` - If the light should be reflected (true) or absorbed (false)
     ///  * `attenuation` - ?
-    ///  * `scattered` - ?
+    ///  * `scattered` - the scattered ray (?)
     /// ```
     /// use raytracer::{material::{NoMat, Material}, ray::Ray, hittable::HitRecord};
     /// let mat = NoMat{};
@@ -82,11 +83,12 @@ impl Dielectric {
 
 impl Material for Dielectric {
     fn scatter(&self, r_in: Ray, rec: &HitRecord) -> (bool, Color, Ray) {
+        // TODO: look at Snell's Law
         let ri = if rec.front_face {1. / self.refraction_index} else {self.refraction_index};
 
         let unit_direction = r_in.direction().unit_vector();
         let cos_theta = (unit_direction*(-1.)).dot(rec.normal).min(1.);
-        let sin_theta = (cos_theta*cos_theta*(-1.) + 1.).sqrt();
+        let sin_theta = (1. - cos_theta*cos_theta).sqrt();
 
         let cannot_refract = ri*sin_theta > 1.;
         let direction = if cannot_refract || self.reflectance(cos_theta, ri) > get_random_f64() {Vec3::reflect(unit_direction, rec.normal)}
