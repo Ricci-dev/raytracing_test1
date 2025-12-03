@@ -84,6 +84,9 @@ impl Dielectric {
 impl Material for Dielectric {
     fn scatter(&self, r_in: Ray, rec: &HitRecord) -> (bool, Color, Ray) {
         // TODO: look at Snell's Law
+        // Nur von Luft in anders, bzw. anderes in Luft akkurat (einfachheit?)
+        // Solution: track current refraction index
+        // `ri` = refraction index old/new (old = Air => 1/new;             new = Air => old/1 => old)
         let ri = if rec.front_face {1. / self.refraction_index} else {self.refraction_index};
 
         let unit_direction = r_in.direction().unit_vector();

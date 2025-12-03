@@ -1,6 +1,6 @@
 use std::ops::{Add, Div, Mul, Sub};
 
-use crate::{interval::Interval, vec3::{Vec3, Vec3Trait}};
+use crate::{interval::Interval, rtweekend::{get_random_f64, get_random_f64_range}, vec3::{Vec3, Vec3Trait}};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Color(f64, f64, f64);
@@ -50,6 +50,14 @@ impl Color {
 
     pub fn b(&self) -> f64 {
         self.2
+    }
+
+    pub fn random() -> Self {
+        Self::new(get_random_f64(), get_random_f64(), get_random_f64())
+    }
+
+    pub fn random_range(min: f64, max: f64) -> Self {
+        Self::new(get_random_f64_range(min, max), get_random_f64_range(min, max), get_random_f64_range(min, max))
     }
 }
 
