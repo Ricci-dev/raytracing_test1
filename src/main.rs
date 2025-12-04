@@ -72,6 +72,8 @@ fn main() {
         Point3::new(13., 2., 3.),
         Point3::new(0., 0., 0.),
         Vec3::new(0., 1., 0.), // Look up (or sideways if u change it, SHOULD NOT BE PARALLEL TO VIEW DIRECTION)
+        0.6,
+        10.
     );
     cam.render(&world2);
 }

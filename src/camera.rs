@@ -13,6 +13,9 @@ pub struct Camera {
     pub lookat: Point3, // Pos where cam is looking at
     pub vup: Vec3, // Camera-relative up direction
 
+    pub defocus_angle: f64,
+    pub focus_dist: f64,
+
     image_height: i32,
     pixel_samples_scale: f64,
     center: Point3,
@@ -23,12 +26,15 @@ pub struct Camera {
     v: Vec3,
     u: Vec3,
     w: Vec3,
+
+    defocus_disk_u: Vec3,
+    defocus_disk_v: Vec3,
 }
 
 impl Camera {
-    pub fn new(aspect_ratio: f64, image_width: i32, samples_per_pixel: i32, max_depth: i32, vfov: f64, lookfrom: Point3, lookat: Point3, vup: Vec3) -> Camera {
+    pub fn new(aspect_ratio: f64, image_width: i32, samples_per_pixel: i32, max_depth: i32, vfov: f64, lookfrom: Point3, lookat: Point3, vup: Vec3, defocus_angle: f64, focus_dist: f64) -> Camera {
         Camera {
-            aspect_ratio, image_width, samples_per_pixel, max_depth, vfov, lookfrom, lookat, vup,
+            aspect_ratio, image_width, samples_per_pixel, max_depth, vfov, lookfrom, lookat, vup, defocus_angle, focus_dist,
             // everything zero, values are set later in init
             image_height: 0,
             pixel_samples_scale: 0.,
@@ -39,6 +45,8 @@ impl Camera {
             v: Vec3::nowhere(),
             u: Vec3::nowhere(),
             w: Vec3::nowhere(),
+            defocus_disk_u: Vec3::nowhere(),
+            defocus_disk_v: Vec3::nowhere(),
         }
     }
 
@@ -85,13 +93,14 @@ impl Camera {
         self.pixel_samples_scale = 1. / self.samples_per_pixel as f64;
 
         // Distance viewport <=> camera center
-        let focal_length = (self.lookfrom - self.lookat).len();
+        // let focal_length = (self.lookfrom - self.lookat).len();
         let theta = degrees_to_radians(self.vfov);
         let h = f64::tan(theta/2.);
         // viewport is a virtual rectanglein R3, with the area, we are currently watching (?)
         // We shoot our rays towards this rectangle
         // let viewport_height = 2.;
-        let viewport_height = 2. * h * focal_length;
+        // let viewport_height = 2. * h * focal_length;
+        let viewport_height = 2. * h * self.focus_dist;
         // calc actual ratio, to be more accurate (there are no 0.5 or 0.3532 pixel, that's why set ratio could be inacurate): i_width / i_height
         // calc viewport_wdith: v_width / v_height = a_ratio => a_ratio * v_height = v_width
         let viewport_width = viewport_height * ((self.image_width as f64)/(self.image_height) as f64);
@@ -117,9 +126,14 @@ impl Camera {
         // position of the upper left corner of the viewport (also determines general position of the viewport)
         // TODO: describe effect of focal len better
         // let viewport_upper_left = self.center - Vec3::new(0., 0., focal_length) - (viewport_u/2) - (viewport_v/2);
-        let viewport_upper_left = self.center - focal_length*self.w - (viewport_u/2) - (viewport_v/2);
+        // let viewport_upper_left = self.center - focal_length*self.w - (viewport_u/2) - (viewport_v/2);
+        let viewport_upper_left = self.center - self.focus_dist*self.w - (viewport_u/2) - (viewport_v/2);
         // position of the pixel in the upper left corner of the viewport
         self.pixel00_loc = viewport_upper_left + ((self.pixel_delta_u + self.pixel_delta_v)*0.5);
+
+        let defocus_radius = self.focus_dist*f64::tan(degrees_to_radians(self.defocus_angle/2.));
+        self.defocus_disk_u = self.u * defocus_radius;
+        self.defocus_disk_v = self.v * defocus_radius;
         eprintln!("Image, width: {}, height; {}", self.image_width, self.image_height);
         eprintln!("Viewport, width: {}, height; {}", viewport_width, viewport_height);
     }
@@ -142,7 +156,8 @@ impl Camera {
                                     + (self.pixel_delta_u * (offset.x() + i as f64))
                                     + (self.pixel_delta_v * (offset.y() + j as f64));
         // Create the ray from camera to the chosen pixel
-        let ray_origin = self.center;
+        // let ray_origin = self.center;
+        let ray_origin = if self.defocus_angle <= 0. {self.center} else {self.defocus_disk_sample()};
         let ray_direction = pixel_sample - ray_origin;
         Ray::ray(ray_origin, ray_direction)
     }
@@ -150,6 +165,11 @@ impl Camera {
     /// Generate a random Vector for a pixels that is next to the current pixel
     fn sample_square(&self) -> Vec3 {
         Vec3::new(get_random_f64() - 0.5, get_random_f64() - 0.5, 0.)
+    }
+
+    fn defocus_disk_sample(&self) -> Point3 {
+        let p = Vec3::random_in_unit_disk();
+        self.center + (p.x()*self.defocus_disk_u) + (p.y()*self.defocus_disk_v)
     }
 
     fn ray_color(&self, r: Ray, depth: i32, world: &HittableList) -> Color {

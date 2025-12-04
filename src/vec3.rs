@@ -106,6 +106,15 @@ impl Vec3 {
     pub fn random_range(min: f64, max: f64) -> Self {
         Self::new(get_random_f64_range(min, max), get_random_f64_range(min, max), get_random_f64_range(min, max))
     }
+
+    pub fn random_in_unit_disk() -> Vec3 {
+        loop {
+            let p = Vec3::new(get_random_f64_range(-1., 1.), get_random_f64_range(-1., 1.), 0.);
+            if p.length_squared() < 1. {
+                return p;
+            }
+        }
+    }
 }
 
 impl Add<Point3> for Vec3 {
