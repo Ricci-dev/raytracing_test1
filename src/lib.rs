@@ -9,3 +9,4 @@ pub mod rtweekend;
 pub mod interval;
 pub mod camera;
 pub mod material;
+pub mod aabb;

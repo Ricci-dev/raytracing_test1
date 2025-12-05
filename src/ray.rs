@@ -5,6 +5,7 @@ use crate::{point3::Point3, vec3::Vec3};
 pub struct Ray {
     origin: Point3,
     direction: Vec3,
+    tm:f64,
 }
 
 impl Ray {
@@ -13,7 +14,20 @@ impl Ray {
         Ray {
             origin: origin,
             direction: direction,
+            tm: 0.,
         }
+    }
+
+    pub fn rayt(origin: Point3, direction: Vec3, time: f64) -> Ray {
+        Ray {
+            origin: origin,
+            direction: direction,
+            tm: time,
+        }
+    }
+
+    pub fn time(&self) -> f64 {
+        self.tm
     }
 
     /// Placeholder ray (origin, no direction)
@@ -21,6 +35,7 @@ impl Ray {
         Ray {
             origin: Point3::origin(),
             direction: Vec3::nowhere(),
+            tm: 0.,
         }
     }
 

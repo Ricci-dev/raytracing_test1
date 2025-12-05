@@ -39,7 +39,8 @@ fn main() {
                 if choose_mat < 0.8 {
                     let albedo = Color::random() * Color::random();
                     sphere_material = Lambertian::new(albedo);
-                    world2.add(Sphere::new(center, 0.2, sphere_material));
+                    let center2 = center + Vec3::new(0., get_random_f64_range(0., 0.5), 0.);
+                    world2.add(Sphere::newm(center, center2, 0.2, sphere_material));
                 } else if choose_mat < 0.95 {
                     let albedo = Color::random_range(0.5, 1.);
                     let fuzz = get_random_f64_range(0., 0.5);
@@ -65,8 +66,8 @@ fn main() {
     let mut cam = Camera::new(
         16./9.,
         //400,
-        1200,
-        500,
+        800,
+        200,
         50,
         20.,
         Point3::new(13., 2., 3.),

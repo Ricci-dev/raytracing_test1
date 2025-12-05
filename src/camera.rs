@@ -159,7 +159,9 @@ impl Camera {
         // let ray_origin = self.center;
         let ray_origin = if self.defocus_angle <= 0. {self.center} else {self.defocus_disk_sample()};
         let ray_direction = pixel_sample - ray_origin;
-        Ray::ray(ray_origin, ray_direction)
+        let ray_time = get_random_f64();
+
+        Ray::rayt(ray_origin, ray_direction, ray_time)
     }
 
     /// Generate a random Vector for a pixels that is next to the current pixel

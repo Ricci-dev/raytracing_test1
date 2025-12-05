@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::{interval::Interval, material::{Material, NoMat}, point3::Point3, ray::Ray, vec3::{Vec3, Vec3Trait}};
+use crate::{aabb::AABB, interval::Interval, material::{Material, NoMat}, point3::Point3, ray::Ray, vec3::{Vec3, Vec3Trait}};
 
 pub struct HitRecord {
     pub p: Point3,
@@ -57,4 +57,5 @@ impl HitRecord {
 
 pub trait Hittable {
     fn hit(&self, r: Ray, ray_t: Interval, rec: &mut HitRecord) -> bool;
+    fn bounding_box(&self) -> AABB;
 }

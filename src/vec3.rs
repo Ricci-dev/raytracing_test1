@@ -10,6 +10,12 @@ pub trait Vec3Trait {
     fn y(&self) -> f64;
     fn z(&self) -> f64;
 
+    fn axis(&self, n: i32) -> f64 {
+        if n==1 {return self.x()}
+        if n==2 {return self.y()}
+        self.z()
+    }
+
     fn length_squared(&self) -> f64 {
         self.x()*self.x() + self.y()*self.y() + self.z()*self.z()
     }

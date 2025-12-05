@@ -39,12 +39,31 @@ impl Interval {
         else {x}
     }
 
+    pub fn expand(&self, delta: f64) -> Interval {
+        let padding = delta/2.;
+        Interval::new(self.min - padding, self.max + padding)
+    }
+
     pub fn min(&self) -> f64 {
         self.min
     }
 
+    pub fn set_min(&mut self, min: f64) {
+        self.min = min
+    }
+
     pub fn max(&self) -> f64 {
         self.max
+    }
+
+    pub fn set_max(&mut self, max: f64) {
+        self.max = max
+    }
+
+    pub fn newii(a: Interval, b: Interval) -> Interval {
+        let min = if a.min() <= b.min() {a.min()} else {b.min()};
+        let max = if a.max() <= b.max() {a.max()} else {b.max()};
+        Interval::new(min, max)
     }
 }
 
